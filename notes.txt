@@ -1,3 +1,10 @@
+App Router
+============================================================================
+
+==============
+Chapter 1
+==============
+
 - Folder structure?
 A. /app: Contains all the routes, components, and logic for your application, this is where you'll be mostly working from.
 /app/lib: Contains functions used in your application, such as reusable utility functions and data fetching functions.
@@ -13,6 +20,10 @@ Followed by pnpm dev to start the development server:
 pnpm dev
 
 pnpm dev starts your Next.js development server on port 3000.
+
+==============
+Chapter 2
+==============
 
 - How to add a global CSS file to your application?
 A. If you look inside the /app/ui folder, you'll see a file called global.css. You can use this file to add CSS rules to all the routes in your application - such as CSS reset rules, site-wide styles for HTML elements like links, and more.
@@ -65,3 +76,42 @@ export default function InvoiceStatus({ status }: { status: string }) {
 A. The following are the other styling solutions:
 1. Sass which allows you to import .css and .scss files.
 2. CSS-in-JS libraries such as styled-jsx, styled-components, and emotion.
+
+==============
+Chapter 3
+==============
+
+- Why optimize fonts is necessary?
+A. Fonts play a significant role in the design of a website, but using custom fonts in your project can affect performance if the font files need to be fetched and loaded.
+
+Cumulative Layout Shift is a metric used by Google to evaluate the performance and user experience of a website. With fonts, layout shift happens when the browser initially renders text in a fallback or system font and then swaps it out for a custom font once it has loaded. This swap can cause the text size, spacing, or layout to change, shifting elements around it.
+
+So Next.js automatically optimizes fonts in the application when you use the next/font module. It downloads font files at build time and hosts them with your other static assets. This means when a user visits your application, there are no additional network requests for fonts which would impact performance.
+
+- How to adding a primary font?
+A. In your /app/ui folder, create a new file called fonts.ts. You'll use this file to keep the fonts that will be used throughout your application.
+
+Import the Inter font from the next/font/google module - this will be your primary font. Then, specify what subset you'd like to load. In this case, 'latin' like:
+import { Inter } from 'next/font/google';
+ 
+export const inter = Inter({ subsets: ['latin'] });
+
+Finally, add the font to the <body> element in /app/layout.tsx like:
+import '@/app/ui/global.css';
+import { inter } from '@/app/ui/fonts';
+ 
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body className={`${inter.className} antialiased`}>{children}</body>
+    </html>
+  );
+}
+
+By adding Inter to the <body> element, the font will be applied throughout your application. Here, you're also adding the Tailwind antialiased class which smooths out the font. It's not necessary to use this class, but it adds a nice touch.
+
+Navigate to your browser, open dev tools and select the body element. You should see Inter and Inter_Fallback are now applied under styles.
