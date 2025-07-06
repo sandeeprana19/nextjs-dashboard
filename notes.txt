@@ -1,9 +1,9 @@
 App Router
 ============================================================================
 
-==============
-Chapter 1
-==============
+==========================
+Chapter 1: Getting Started
+==========================
 
 - Creating a new project?
 A. We recommend using pnpm as your package manager, as it's faster and more efficient than npm or yarn. If you don't have pnpm installed, you can install it globally by running:
@@ -30,9 +30,9 @@ pnpm dev
 
 pnpm dev starts your Next.js development server on port 3000.
 
-==============
-Chapter 2
-==============
+======================
+Chapter 2: CSS Styling
+======================
 
 - How to add a global CSS file to your application?
 A. If you look inside the /app/ui folder, you'll see a file called global.css. You can use this file to add CSS rules to all the routes in your application - such as CSS reset rules, site-wide styles for HTML elements like links, and more.
@@ -90,9 +90,9 @@ A. The following are the other styling solutions:
 - What is one benefit of using CSS modules?
 A. Provide a way to make CSS classes locally scoped to components by default, reducing the risk of styling conflicts.
 
-==============
-Chapter 3
-==============
+======================================
+Chapter 3: Optimizing Fonts and Images
+======================================
 
 - Why optimize fonts is necessary?
 A. Fonts play a significant role in the design of a website, but using custom fonts in your project can affect performance if the font files need to be fetched and loaded.
@@ -222,9 +222,9 @@ A. The <Image> Component is an extension of the HTML <img> tag, and comes with a
 - Images without dimensions and web fonts are common causes of layout shift?
 A. True.
 
-==============
-Chapter 4
-==============
+=====================================
+Chapter 4: Creating Layouts and Pages
+=====================================
 
 - Nested routing?
 A. Next.js uses file-system routing where folders are used to create nested routes. Each folder represents a route segment that maps to a URL segment. For diagram: checkout nesting-routing-1.pdf file.
@@ -267,9 +267,9 @@ Without partial rendering, each navigation would cause the full page to re-rende
 - What is the purpose of the layout file in Next.js?
 A. To share UI across multiple pages.
 
-==============
-Chapter 5
-==============
+===================================
+Chapter 5: Navigating Between Pages
+===================================
 
 - Why optimize navigation?
 A. To link between pages, you'd traditionally use the <a> HTML element. At the moment, the sidebar links use <a> elements, but notice what happens when you navigate between the home, invoices, and customers pages on your browser.
@@ -322,3 +322,198 @@ A. Prefetches the code for the linked route.
 
 - usePathname?
 A. usePathname is a Client Component hook that lets you read the current URL's pathname.
+
+===================================
+Chapter 6: Setting Up Your Database
+===================================
+
+- Create a Postgres database
+A. Below:
+i. Next, to set up a database, click Continue to Dashboard and select the Storage tab from your project dashboard. Select Create Database. Depending on when your Vercel account was created, you may see options like Neon or Supabase. Choose your preferred provider and click Continue.
+ii. Choose your region and storage plan, if required. The default region for all Vercel projects is Washington D.C (iad1), and we recommend choosing this if available to reduce latency for data requests.
+iii. Once connected, navigate to the .env.local tab, click Show secret and Copy Snippet. Make sure you reveal the secrets before copying them.
+iv. Navigate to your code editor and rename the .env.example file to .env. Paste in the copied contents from Vercel.
+
+- What is 'seeding' in the context of databases?
+A. Populating the database with an initial set of data is known as 'seeding' in the context of databases.
+
+========================
+Chapter 7: Fetching Data
+========================
+
+- Choosing how to fetch data?
+A. Below:
+API layer
+APIs are an intermediary layer between your application code and database. There are a few cases where you might use an API:
+
+. If you're using third-party services that provide an API.
+. If you're fetching data from the client, you want to have an API layer that runs on the server to avoid exposing your database secrets to the client.
+. In Next.js, you can create API endpoints using Route Handlers.
+
+Database queries
+When you're creating a full-stack application, you'll also need to write logic to interact with your database. For relational databases like Postgres, you can do this with SQL or with an ORM.
+
+There are a few cases where you have to write database queries:
+
+. When creating your API endpoints, you need to write logic to interact with your database.
+. If you are using React Server Components (fetching data on the server), you can skip the API layer, and query your database directly without risking exposing your database secrets to the client.
+
+- In which of these scenarios should you not query your database directly?
+A. When you're fetching data on the client
+
+- Using Server Components to fetch data?
+A. By default, Next.js applications use React Server Components. Fetching data with Server Components is a relatively new approach and there are a few benefits of using them:
+
+. Server Components support JavaScript Promises, providing a solution for asynchronous tasks like data fetching natively. You can use async/await syntax without needing useEffect, useState or other data fetching libraries.
+. Server Components run on the server, so you can keep expensive data fetches and logic on the server, only sending the result to the client.
+. Since Server Components run on the server, you can query the database directly without an additional API layer. This saves you from writing and maintaining additional code.
+
+- What's one advantage of using React Server Components to fetch data?
+A. They allow you to query the database directly from the server without an additional API layer.
+
+- Using SQL?
+A. For your dashboard application, you'll write database queries using the postgres.js library and SQL. There are a few reasons why we'll be using SQL:
+
+. SQL is the industry standard for querying relational databases (e.g. ORMs generate SQL under the hood).
+. Having a basic understanding of SQL can help you understand the fundamentals of relational databases, allowing you to apply your knowledge to other tools.
+. SQL is versatile, allowing you to fetch and manipulate specific data.
+. The postgres.js library provides protection against SQL injections.
+
+- What does SQL allow you to do in terms of fetching data?
+A. Fetch and manipulate specific data.
+
+- Fetching data for the dashboard overview page
+A. Now that you understand different ways of fetching data, let's fetch data for the dashboard overview page. Navigate to /app/dashboard/page.tsx, paste the following code, and spend some time exploring it:
+
+import { Card } from '@/app/ui/dashboard/cards';
+import RevenueChart from '@/app/ui/dashboard/revenue-chart';
+import LatestInvoices from '@/app/ui/dashboard/latest-invoices';
+import { lusitana } from '@/app/ui/fonts';
+ 
+export default async function Page() {
+  return (
+    <main>
+      <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
+        Dashboard
+      </h1>
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {/* <Card title="Collected" value={totalPaidInvoices} type="collected" /> */}
+        {/* <Card title="Pending" value={totalPendingInvoices} type="pending" /> */}
+        {/* <Card title="Total Invoices" value={numberOfInvoices} type="invoices" /> */}
+        {/* <Card
+          title="Total Customers"
+          value={numberOfCustomers}
+          type="customers"
+        /> */}
+      </div>
+      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-4 lg:grid-cols-8">
+        {/* <RevenueChart revenue={revenue}  /> */}
+        {/* <LatestInvoices latestInvoices={latestInvoices} /> */}
+      </div>
+    </main>
+  );
+}
+
+The code above is intentionally commented out. We will now begin to example each piece.
+
+. The page is an async server component. This allows you to use await to fetch data.
+. There are also 3 components which receive data: <Card>, <RevenueChart>, and <LatestInvoices>. They are currently commented out and not yet implemented.
+
+- Fetching data for <RevenueChart/>
+A. To fetch data for the <RevenueChart/> component, import the fetchRevenue function from data.ts and call it inside your component:
+import { Card } from '@/app/ui/dashboard/cards';
+import RevenueChart from '@/app/ui/dashboard/revenue-chart';
+import LatestInvoices from '@/app/ui/dashboard/latest-invoices';
+import { lusitana } from '@/app/ui/fonts';
+import { fetchRevenue } from '@/app/lib/data';
+ 
+export default async function Page() {
+  const revenue = await fetchRevenue();
+  // ...
+}
+
+Next, let's do the following:
+. Uncomment the <RevenueChart/> component.
+. Navigate to the component file (/app/ui/dashboard/revenue-chart.tsx) and uncomment the code inside it.
+. Check localhost:3000 and you should see a chart that uses revenue data.
+
+- Fetching data for <LatestInvoices/>
+A. For the <LatestInvoices /> component, we need to get the latest 5 invoices, sorted by date.
+
+You could fetch all the invoices and sort through them using JavaScript. This isn't a problem as our data is small, but as your application grows, it can significantly increase the amount of data transferred on each request and the JavaScript required to sort through it.
+
+Instead of sorting through the latest invoices in-memory, you can use an SQL query to fetch only the last 5 invoices. For example, this is the SQL query from your data.ts file:
+// Fetch the last 5 invoices, sorted by date
+const data = await sql<LatestInvoiceRaw[]>`
+  SELECT invoices.amount, customers.name, customers.image_url, customers.email
+  FROM invoices
+  JOIN customers ON invoices.customer_id = customers.id
+  ORDER BY invoices.date DESC
+  LIMIT 5`;
+
+In your page, import the fetchLatestInvoices function:
+import { Card } from '@/app/ui/dashboard/cards';
+import RevenueChart from '@/app/ui/dashboard/revenue-chart';
+import LatestInvoices from '@/app/ui/dashboard/latest-invoices';
+import { lusitana } from '@/app/ui/fonts';
+import { fetchRevenue, fetchLatestInvoices } from '@/app/lib/data';
+ 
+export default async function Page() {
+  const revenue = await fetchRevenue();
+  const latestInvoices = await fetchLatestInvoices();
+  // ...
+}
+
+Then, uncomment the <LatestInvoices /> component. You will also need to uncomment the relevant code in the <LatestInvoices /> component itself, located at /app/ui/dashboard/latest-invoices.
+
+If you visit your localhost, you should see that only the last 5 are returned from the database. Hopefully, you're beginning to see the advantages of querying your database directly!
+
+- Define Static Rendering?
+a. By default, Next.js prerenders routes to improve performance, this is called Static Rendering. So if your data changes, it won't be reflected in your dashboard.
+
+- What are request waterfalls?
+A. A "waterfall" refers to a sequence of network requests that depend on the completion of previous requests. In the case of data fetching, each request can only begin once the previous request has returned data.
+
+For example, we need to wait for fetchRevenue() to execute before fetchLatestInvoices() can start running, and so on:
+const revenue = await fetchRevenue();
+const latestInvoices = await fetchLatestInvoices(); // wait for fetchRevenue() to finish
+const {
+  numberOfInvoices,
+  numberOfCustomers,
+  totalPaidInvoices,
+  totalPendingInvoices,
+} = await fetchCardData(); // wait for fetchLatestInvoices() to finish
+
+This pattern is not necessarily bad. There may be cases where you want waterfalls because you want a condition to be satisfied before you make the next request. For example, you might want to fetch a user's ID and profile information first. Once you have the ID, you might then proceed to fetch their list of friends. In this case, each request is contingent on the data returned from the previous request.
+
+However, this behavior can also be unintentional and impact performance.
+
+- When might you want to use a waterfall pattern?
+A. To satisfy a condition before making the next request
+
+- Parallel data fetching
+A. A common way to avoid waterfalls is to initiate all data requests at the same time - in parallel.
+
+In JavaScript, you can use the Promise.all() or Promise.allSettled() functions to initiate all promises at the same time. For example, in data.ts, we're using Promise.all() in the fetchCardData() function:
+export async function fetchCardData() {
+  try {
+    const invoiceCountPromise = sql`SELECT COUNT(*) FROM invoices`;
+    const customerCountPromise = sql`SELECT COUNT(*) FROM customers`;
+    const invoiceStatusPromise = sql`SELECT
+         SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END) AS "paid",
+         SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END) AS "pending"
+         FROM invoices`;
+ 
+    const data = await Promise.all([
+      invoiceCountPromise,
+      customerCountPromise,
+      invoiceStatusPromise,
+    ]);
+    // ...
+  }
+}
+
+By using this pattern, you can:
+
+Start executing all data fetches at the same time, which is faster than waiting for each request to complete in a waterfall.
+Use a native JavaScript pattern that can be applied to any library or framework.
